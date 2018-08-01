@@ -146,6 +146,7 @@ public :
    vector<float>   *hgcal_trackmatchingdR;
    Int_t           cl3d_n;
    vector<float>   *cl3d_pt;
+   vector<float>   *cl3d_egid;
    vector<float>   *cl3d_energy;
    vector<float>   *cl3d_eta;
    vector<float>   *cl3d_phi;
@@ -281,6 +282,7 @@ public :
    TBranch        *b_hgcal_trackmatchingdR;
    TBranch        *b_cl3d_n;   //!
    TBranch        *b_cl3d_pt;   //!
+   TBranch        *b_cl3d_egid;   //!
    TBranch        *b_cl3d_energy;   //!
    TBranch        *b_cl3d_eta;   //!
    TBranch        *b_cl3d_phi;   //!
@@ -728,6 +730,7 @@ void test::Init(TTree *tree)
    hgcal_trackHighestPtCutChi2Chi2 = 0;
    hgcal_trackmatchingdR = 0;
    cl3d_pt = 0;
+   cl3d_egid = 0;
    cl3d_energy = 0;
    cl3d_eta = 0;
    cl3d_phi = 0;
@@ -865,6 +868,7 @@ void test::Init(TTree *tree)
    fChain->SetBranchAddress("hgcal_trackmatchingdR", &hgcal_trackmatchingdR, &b_hgcal_trackmatchingdR);
    fChain->SetBranchAddress("cl3d_n", &cl3d_n, &b_cl3d_n);
    fChain->SetBranchAddress("cl3d_pt", &cl3d_pt, &b_cl3d_pt);
+   fChain->SetBranchAddress("cl3d_egid", &cl3d_egid, &b_cl3d_egid);
    fChain->SetBranchAddress("cl3d_energy", &cl3d_energy, &b_cl3d_energy);
    fChain->SetBranchAddress("cl3d_eta", &cl3d_eta, &b_cl3d_eta);
    fChain->SetBranchAddress("cl3d_phi", &cl3d_phi, &b_cl3d_phi);
@@ -1144,6 +1148,65 @@ void test::StorePixelHit(int region){
            current_hit.SetXYZ( fRecHitGx->at(a), fRecHitGy->at(a), fRecHitGz->at(a) );
            Dphi = deltaPhi(current_hit.Phi(), EgPhi);
 
+           if( region == 6 ){
+
+             if( fRecHitDisk->at(a) == 3 ){ // second disk
+               if( Dphi < L1_Dphi_cut1 && Dphi > L1_Dphi_cut2){
+                  Dphi_Ele_pass = 1; el_or_po = 1;
+               }
+               if( Dphi > -L1_Dphi_cut1 && Dphi < -L1_Dphi_cut2){
+                  Dphi_Pos_pass = 1; el_or_po = el_or_po + 2;
+               }
+               if( Dphi_Ele_pass || Dphi_Pos_pass ){
+                 layers[1]++;
+                 first_layer_hits.push_back( TVector3(fRecHitGx->at(a), fRecHitGy->at(a), fRecHitGz->at(a)));
+                 first_layer_hits_Ele_or_Pos.push_back(el_or_po);
+               }
+             }
+
+             if( fRecHitDisk->at(a) == 4 ){ // third disk
+               if( Dphi < L2_Dphi_cut1 && Dphi > L2_Dphi_cut2){
+                  Dphi_Ele_pass = 1; el_or_po = 1;
+               }
+               if( Dphi > -L2_Dphi_cut1 && Dphi < -L2_Dphi_cut2){
+                  Dphi_Pos_pass = 1; el_or_po = el_or_po + 2;
+               }
+               if( Dphi_Ele_pass || Dphi_Pos_pass ){
+                 layers[2]++;
+                 second_layer_hits.push_back( TVector3(fRecHitGx->at(a), fRecHitGy->at(a), fRecHitGz->at(a)));
+                 second_layer_hits_Ele_or_Pos.push_back(el_or_po);
+               }
+             }
+             if( fRecHitDisk->at(a) == 5 ){ // fourth disk
+               if( Dphi < L3_Dphi_cut1 && Dphi > L3_Dphi_cut2){
+                  Dphi_Ele_pass = 1; el_or_po = 1;
+               }
+               if( Dphi > -L3_Dphi_cut1 && Dphi < -L3_Dphi_cut2){
+                  Dphi_Pos_pass = 1; el_or_po = el_or_po + 2;
+               }
+               if( Dphi_Ele_pass || Dphi_Pos_pass ){
+                 layers[3]++;
+                 third_layer_hits.push_back( TVector3(fRecHitGx->at(a), fRecHitGy->at(a), fRecHitGz->at(a)));
+                 third_layer_hits_Ele_or_Pos.push_back(el_or_po);
+               }
+             }
+
+             if( fRecHitDisk->at(a) == 6 ){ // fifth disk
+               if( Dphi < L4_Dphi_cut1 && Dphi > L4_Dphi_cut2){
+                  Dphi_Ele_pass = 1; el_or_po = 1;
+               }
+               if( Dphi > -L4_Dphi_cut1 && Dphi < -L4_Dphi_cut2){
+                  Dphi_Pos_pass = 1; el_or_po = el_or_po + 2;
+               }
+               if( Dphi_Ele_pass || Dphi_Pos_pass ){
+                 layers[4]++;
+                 fourth_layer_hits.push_back( TVector3(fRecHitGx->at(a), fRecHitGy->at(a), fRecHitGz->at(a)));
+                 fourth_layer_hits_Ele_or_Pos.push_back(el_or_po);
+               }
+             }
+
+           }
+
            if( region == 5 ){
 
              if( fRecHitDisk->at(a) == 2 ){ // second disk
@@ -1361,6 +1424,10 @@ void test::SetROI(int region){
 
   float upper_width = 0.055;
   float lower_width = 0.055;
+
+  if(region ==6){
+         region = 5;
+   }
 
   L1_Dphi_cut1 = ROI_func(region, EgEt);
   L1_Dphi_cut2 = ROI_func(region, EgEt);

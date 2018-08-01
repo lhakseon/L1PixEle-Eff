@@ -33,7 +33,7 @@ void test::Loop()
    const double EM_PiX_deta_width_[9] = {0.015, 0.03, 0.031, 0.033, 0.035, 0.037, 0.039, 0.04, 0.05};
 
    const double PiX_PiX_dphi_width_[9] = {0.0025, 0.0035, 0.0031, 0.0033, 0.0035, 0.0037, 0.0039, 0.004, 0.005};
-   const double PiX_PiX_deta_width_[9] = {0.0045, 0.0035, 0.0031, 0.0033, 0.0035, 0.0037, 0.0039, 0.004, 0.005};
+   const double PiX_PiX_deta_width_[9] = {0.0045, 0.0055, 0.0031, 0.0033, 0.0035, 0.0037, 0.0039, 0.004, 0.005};
 
 
   //nentries = 100;
@@ -113,10 +113,12 @@ void test::Loop()
       for(int i=0; i < cl3d_N_;i++){
 
          // simplge Egamma ID for HGCAL
-         if(cl3d_coreshowerlength->at(i) < 3 || cl3d_coreshowerlength->at(i) > 18) continue;
-         if(cl3d_srrtot->at(i) < 0.002 || cl3d_srrtot->at(i) > 0.005) continue;
-         if(cl3d_maxlayer->at(i) < 8 || cl3d_maxlayer->at(i) > 20) continue;
-         if(cl3d_firstlayer->at(i) > 5) continue;
+         //if(cl3d_coreshowerlength->at(i) < 3 || cl3d_coreshowerlength->at(i) > 18) continue;
+         //if(cl3d_srrtot->at(i) < 0.002 || cl3d_srrtot->at(i) > 0.005) continue;
+         //if(cl3d_maxlayer->at(i) < 8 || cl3d_maxlayer->at(i) > 20) continue;
+         //if(cl3d_firstlayer->at(i) > 5) continue;
+
+         if(cl3d_egid->at(i) != 1) continue;
 
          float dPhi = deltaPhi(propgenElPartPhi->at(0), cl3d_phi->at(i));
 
@@ -189,10 +191,9 @@ void test::Loop()
       if( fabs(EgEta) <= 0.8 ) eta_region =1;
       if( fabs(EgEta) <= 1.4 && fabs(EgEta) > 0.8 ) eta_region =2;
       if( fabs(EgEta) <= 1.8 && fabs(EgEta) > 1.4 ) eta_region =3;
-      //if( fabs(EgEta) <= 2.4 && fabs(EgEta) > 1.8 ) eta_region =4;
       if( fabs(EgEta) <= 2.7 && fabs(EgEta) > 1.8 ) eta_region =4;
-      //if( fabs(EgEta) <= 3.0 && fabs(EgEta) > 2.4 ) eta_region =5;
-      if( fabs(EgEta) <= 3.0 && fabs(EgEta) > 2.7 ) eta_region =5;
+      if( fabs(EgEta) <= 2.9 && fabs(EgEta) > 2.7 ) eta_region =5;
+      if( fabs(EgEta) <= 3.0 && fabs(EgEta) > 2.9 ) eta_region =6;
 
       if( fabs(EgEta) > 3. ) continue;
 
@@ -238,6 +239,7 @@ void test::Loop()
        
        if(eta_region == 1) SetSingalBoundary(eta_region, EM_PiX_dphi_width_[nth_eg_pix_deta], EM_PiX_deta_width_[nth_eg_pix_deta], PiX_PiX_dphi_width_[nth_eg_pix_deta], PiX_PiX_deta_width_[nth_eg_pix_deta]);
        else if(eta_region == 2) SetSingalBoundary(eta_region, EM_PiX_dphi_width_[nth_eg_pix_deta+1], EM_PiX_deta_width_[nth_eg_pix_deta+1], PiX_PiX_dphi_width_[nth_eg_pix_deta+1], PiX_PiX_deta_width_[nth_eg_pix_deta+1]);
+       else if(eta_region == 6) SetSingalBoundary(5, EM_PiX_dphi_width_[nth_eg_pix_deta+1], EM_PiX_deta_width_[nth_eg_pix_deta+1], PiX_PiX_dphi_width_[nth_eg_pix_deta+1], PiX_PiX_deta_width_[nth_eg_pix_deta+1]);
        else SetSingalBoundary(eta_region, EM_PiX_dphi_width_[nth_eg_pix_deta], EM_PiX_deta_width_[nth_eg_pix_deta], PiX_PiX_dphi_width_[nth_eg_pix_deta], PiX_PiX_deta_width_[nth_eg_pix_deta]);
 
        //SetSingalBoundary(1);
@@ -440,7 +442,7 @@ void test::Loop()
         }
       }
 
-     if( eta_region == 2 && PixTrkPassed == false) {
+     if( fabs(EgEta) <= 1.4 && fabs(EgEta) > 1.3 && PixTrkPassed == false) {
        for( std::vector<int>::iterator first_hit = hitted_layers.begin(); first_hit != hitted_layers.end(); first_hit++){
           for ( std::vector<int>::iterator second_hit = first_hit+1; second_hit != hitted_layers.end(); second_hit++){
                  

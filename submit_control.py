@@ -12,7 +12,7 @@ def now():
 
 #sample = "SE_PU140"
 sample = "SE_PU200"
-InputDir = "/data7/Users/jhkim/PhaseIIFall17D/SingleE_200PU/"
+InputDir = "/data7/Users/jhkim/PhaseIIFall17D/SingleE_200PU_HGCAL_EGID/"
 #InputDir = "/data7/Users/jhkim/PhaseIISpring17D/Ntuple_140PU/PhaseIISpring17D_SingleE_FlatPt-8to100_140PU/"
 
 os.system("ls " + InputDir + "/*.root > " + "./inputlist.txt") # read input root files 
